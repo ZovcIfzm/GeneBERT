@@ -6,43 +6,42 @@ import pandas as pd
 
 
 
-def convertLabels(trainFile, testFile, validFile, lower, upper):
-    train, test, valid = None, None, None
+def convertLabels(c1_file, c2_file, lower, upper):
 
-    # Read in histone modification data from text files
-    with open(trainFile, "r") as text_file:
-        train_lines = text_file.read().splitlines()
-        train = np.asarray([np.asarray(line.split(",")[1:])for line in train_lines])
+	cell1_df, cell2_df = None, None
 
-    with open(testFile, "r") as text_file:
-        test_lines = text_file.read().splitlines()
-        test = np.asarray([np.asarray(line.split(",")[1:])for line in test_lines])
+	with open(c1_file, "r") as text_file:
+		cell1_expr_lines = text_file.read().splitlines()
+		cell1_expr = np.asarray([np.asarray(line.split(",")[1:]) for line in cell1_expr_lines])
 
-    with open(validFile, "r") as text_file:
-        valid_lines = text_file.read().splitlines()
-        valid = np.asarray([np.asarray(line.split(",")[1:])for line in valid_lines])
+	with open(c2_file, "r") as text_file:
 
-    #Concatenate data into single numpy matrix
-    Cell1_concat = np.concatenate((train, test, valid), axis=0)
-
-    #Convert numpy matrix to pandas dataframe
-    df = pd.DataFrame(Cell1_concat)
-    df = df.apply(pd.to_numeric)
-    cols = ["hm1", "hm2", "hm3", "hm4", "hm5"]
-    df.columns = cols
+		cell2_expr_lines = text_file.read().splitlines()
+		cell2_expr = np.asarray([np.asarray(line.split(",")[1:])for line in cell2_expr_lines])
 
 
-    df = df.applymap(lambda x: 'low' if x < lower else ('medium' if (x >= lower and x <= upper) else 'high'))
+	cell1_df = pd.DataFrame(cell1_expr)
+	cell2_df = pd.DataFrame(cell2_expr)
 
-    print(df.head())
+	cell1_df = cell1_df.apply(pd.to_numeric)
+	cell2_df = cell2_df.apply(pd.to_numeric)
 
+	cell1_df.columns = ["expr"]
+	cell2_df.columns = ["expr"]
+
+	cell1_df["expr"] = np.log(cell1_df["expr"]+1)
+	cell2_df["expr"] = np.log(cell2_df["expr"]+1)
+
+	new_df = cell1_df-cell2_df
+
+	new_df.applymap(lambda x: 'low' if x < lower else ('medium' if (x >= lower and x <= upper) else 'high'))
+	print(new_df.head())
 
 parser = argparse.ArgumentParser(description='CreateLabels')
 parser.add_argument('--lower', type=int, default=-5, help='lower limit for middle category')
 parser.add_argument('--upper', type=int, default=2, help='upper limit for middle category')
-parser.add_argument('--trainFile', type=str, default='data/Cell1.train.csv', help='Path to train data')
-parser.add_argument('--testFile', type=str, default='data/Cell1.test.csv', help='Path to test data')
-parser.add_argument('--validFile', type=str, default='data/Cell1.valid.csv', help='Path to valid data')
+parser.add_argument('--c1_file', type=str, default='data/Cell1.expr.csv', help='Path to file for cell 1')
+parser.add_argument('--c2_file', type=str, default='data/Cell1.expr.csv', help='Path to file for cell 2')
 
 
 args = parser.parse_args()
@@ -55,7 +54,7 @@ upper = args.upper
 # Labels > upper -> 'high'
 
 
-convertLabels(args.trainFile, args.testFile, args.validFile, args.lower, args.upper)
+convertLabels(args.c1_file, args.c2_file, args.lower, args.upper)
 
 
 
