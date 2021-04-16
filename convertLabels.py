@@ -34,7 +34,7 @@ def convertLabels(c1_file, c2_file, lower, upper):
 
 	new_df = cell1_df-cell2_df
 
-	new_df.applymap(lambda x: 'low' if x < lower else ('medium' if (x >= lower and x <= upper) else 'high'))
+	new_df = new_df.applymap(lambda x: 'low' if x < lower else ('medium' if (x >= lower and x <= upper) else 'high'))
 	print(new_df.head())
 
 parser = argparse.ArgumentParser(description='CreateLabels')
