@@ -22,6 +22,8 @@ from transformers import (
     RobertaConfig,
     RobertaForSequenceClassification,
     RobertaTokenizer,
+    RobertaTokenizerFast,
+    RobertaForMaskedLM,
     get_linear_schedule_with_warmup,
 )
 
@@ -43,11 +45,11 @@ def main(args):
         num_labels=args.num_labels,
     )
 
-    tokenizer = RobertaTokenizer.from_pretrained(
+    tokenizer = RobertaTokenizerFast.from_pretrained(
         args.model_name_or_path
     )
 
-    model = RobertaForSequenceClassification.from_pretrained(
+    model = RobertaForMaskedLM.from_pretrained(
         args.model_name_or_path,
         config=config,
     )
@@ -69,9 +71,7 @@ def main(args):
         print('Loading training data ...')
         train_data = Dataset(
             path_to_file=args.data,
-            fields=fields,
-            filter_pred=lambda ex: args.src_min <= len(ex.src) <= args.src_max \
-                and args.ref_min <= len(ex.ref) <= args.ref_max
+            fields=fields
         )
 
         train_iter = Iterator(
@@ -108,7 +108,7 @@ def main(args):
         refs_list = []
 
         print("DEBUG::tokeniszerlength", len(tokenizer))
-        model.resize_token_embeddings(len(tokenizer))
+        #model.resize_token_embeddings(len(tokenizer))
         print("DEBUG::", len(valid_iter))
         for batch in tqdm(valid_iter, total=len(valid_iter)):
             input_ids = torch.cat([batch.src, batch.ref[:, 1:]], dim=1).to(device)
@@ -150,9 +150,7 @@ def main(args):
         print('Loading test data ...')
         test_data = Dataset(
             path_to_file=args.data,
-            fields=fields,
-            filter_pred=lambda ex: args.src_min <= len(ex.src) <= args.src_max \
-                and args.ref_min <= len(ex.ref) <= args.ref_max
+            fields=fields
         )
 
         test_iter = Iterator(
@@ -203,6 +201,10 @@ def train(args, train_iter, model, device):
                 ]
                 token_type_ids = torch.cat(token_type_ids, dim=1).to(device)
                 labels = batch.score.to(device)
+                
+                print("DEBUG::Train", input_ids.shape, token_type_ids.shape, labels.shape)
+                #print("DEBUG::MAX", max(input_ids), max(token_type_ids), max(labels))
+                print("DEBUG::actual", input_ids)
                 outputs = model(input_ids, token_type_ids=token_type_ids, labels=labels)
                 loss, logits = outputs[:2]
 
