@@ -1,8 +1,17 @@
-abc def abc hhh abc
-def def hhh
-test four three
-four five three two siz
-abc def abc hhh abc
-def def hhh
-test four three
-four five three two siz
+mkdir ./checkpoints # directory to save fine-tuned model
+python run_regression.py \
+  --do_train \
+  --data ./sample_data/Train.tsv \
+  --save_dir ./checkpoints \
+  --model_type roberta \
+  --model_name_or_path DeepInflam \
+  --num_labels 1 \
+  --max_epoch 3
+
+python run_regression.py \
+  --do_eval \
+  --data ./sample_data/Valid.tsv \
+  --model_type bert \
+  --model_name_or_path ./checkpoints \
+  --num_labels 1 \
+  --threshold 0.5

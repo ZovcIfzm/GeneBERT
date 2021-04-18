@@ -11,7 +11,7 @@ paths = [str(x) for x in Path(DATA_DIR).glob("**/*.tsv")]
 tokenizer = ByteLevelBPETokenizer()
 
 # Customize training
-tokenizer.train(files=paths, vocab_size=1000, min_frequency=2, special_tokens=[
+tokenizer.train(files=paths, vocab_size=261, min_frequency=2, special_tokens=[
     "<s>",
     "<pad>",
     "</s>",
@@ -34,7 +34,7 @@ tokenizer._tokenizer.post_processor = BertProcessing(
     ("</s>", tokenizer.token_to_id("</s>")),
     ("<s>", tokenizer.token_to_id("<s>")),
 )
-tokenizer.enable_truncation(max_length=512)
+tokenizer.enable_truncation(max_length=261)
 
 print("three four encoded: ", tokenizer.encode("three four"))
 
@@ -45,8 +45,8 @@ import torch
 from transformers import RobertaConfig
 
 config = RobertaConfig(
-    vocab_size=1000,
-    max_position_embeddings=514,
+    vocab_size=261,
+    max_position_embeddings=130,
     num_attention_heads=12,
     num_hidden_layers=6,
     type_vocab_size=1,
@@ -54,7 +54,7 @@ config = RobertaConfig(
 
 from transformers import RobertaTokenizerFast
 
-tokenizer = RobertaTokenizerFast.from_pretrained(MODEL_DIR, max_len=512)
+tokenizer = RobertaTokenizerFast.from_pretrained(MODEL_DIR, max_len=261)
 
 from transformers import RobertaForMaskedLM
 
@@ -67,7 +67,7 @@ from transformers import LineByLineTextDataset
 
 dataset = LineByLineTextDataset(
     tokenizer=tokenizer,
-    file_path=DATA_DIR+"/trainValidCorpus.tsv",
+    file_path=DATA_DIR+"/trainValidCorpus.txt",
     block_size=128,
 )
 

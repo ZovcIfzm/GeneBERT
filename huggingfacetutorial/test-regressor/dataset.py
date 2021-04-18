@@ -19,6 +19,7 @@ class Example(object):
     def from_tsv(cls, line, fields):
         ex = cls()
         line = line.rstrip().split('\t')
+        # print("DEBUG::", len(fields), len(line))
         assert len(fields) == len(line)
         for (name, field), line in zip(fields, line):
             setattr(ex, name, field.preprocess(line))
@@ -87,6 +88,7 @@ class Dataset(object):
     def __init__(self, path_to_file, fields, filter_pred=None):
         self.fields = fields
         n_lines = count_lines(path_to_file)
+        print("DEBUG::n_lines:", n_lines)
         with open(path_to_file, 'r') as f:
             examples = [Example.from_tsv(line, fields) 
                         for line in tqdm(f, total=n_lines)]

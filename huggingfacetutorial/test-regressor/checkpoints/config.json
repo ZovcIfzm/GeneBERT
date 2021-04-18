@@ -1,6 +1,7 @@
 {
+  "_name_or_path": "DeepInflam",
   "architectures": [
-    "RobertaForMaskedLM"
+    "RobertaForSequenceClassification"
   ],
   "attention_probs_dropout_prob": 0.1,
   "bos_token_id": 0,
@@ -9,8 +10,14 @@
   "hidden_act": "gelu",
   "hidden_dropout_prob": 0.1,
   "hidden_size": 768,
+  "id2label": {
+    "0": "LABEL_0"
+  },
   "initializer_range": 0.02,
   "intermediate_size": 3072,
+  "label2id": {
+    "LABEL_0": 0
+  },
   "layer_norm_eps": 1e-12,
   "max_position_embeddings": 130,
   "model_type": "roberta",

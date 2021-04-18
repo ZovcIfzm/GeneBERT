@@ -32,40 +32,27 @@ from dataset import (
     Iterator,
 )
 
-ALL_MODELS = sum(
-    (
-        tuple(conf.pretrained_config_archive_map.keys())
-        for conf in (BertConfig, RobertaConfig)
-    ),
-    (),
-)
-
-
-MODEL_CLASSES = {
-    "bert": (BertConfig, BertForSequenceClassification, BertTokenizer),
-    "roberta": (RobertaConfig, RobertaForSequenceClassification, RobertaTokenizer),
-}
-
 
 def main(args):
-    device = torch.device('cuda' if args.gpu  else 'cpu')
+
+    device = torch.device('cpu')
 
     # Load pretrained model and tokenizer
-    config_cls, model_cls, tokenizer_cls = MODEL_CLASSES[args.model_type]
-    config = config_cls.from_pretrained(
-        args.config_name if args.config_name else args.model_name_or_path,
+    config = RobertaConfig.from_pretrained(
+        args.model_name_or_path,
         num_labels=args.num_labels,
     )
 
-    tokenizer = tokenizer_cls.from_pretrained(
-        args.tokenizer_name if args.tokenizer_name else args.model_name_or_path,
-        do_lower_case=args.do_lower_case,
+    tokenizer = RobertaTokenizer.from_pretrained(
+        args.model_name_or_path
     )
 
-    model = model_cls.from_pretrained(
+    model = RobertaForSequenceClassification.from_pretrained(
         args.model_name_or_path,
         config=config,
     )
+    
+
     model.to(device)
 
     text_field = TextField(tokenizer)
@@ -107,9 +94,7 @@ def main(args):
         print('Loading development data ...')
         valid_data = Dataset(
             path_to_file=args.data,
-            fields=fields,
-            filter_pred=lambda ex: args.src_min <= len(ex.src) <= args.src_max \
-                and args.ref_min <= len(ex.ref) <= args.ref_max
+            fields=fields
         )
 
         valid_iter = Iterator(
@@ -122,6 +107,9 @@ def main(args):
         preds_list = [] 
         refs_list = []
 
+        print("DEBUG::tokeniszerlength", len(tokenizer))
+        model.resize_token_embeddings(len(tokenizer))
+        print("DEBUG::", len(valid_iter))
         for batch in tqdm(valid_iter, total=len(valid_iter)):
             input_ids = torch.cat([batch.src, batch.ref[:, 1:]], dim=1).to(device)
             labels = batch.score.squeeze(1).to(device)
@@ -130,9 +118,12 @@ def main(args):
                 torch.zeros_like(batch.src),
                 torch.ones_like(batch.ref[:, 1:])
             ]
-            token_type_ids = torch.cat(token_type_ids, dim=1).to(device)
-            outputs = model(input_ids, token_type_ids=token_type_ids, labels=labels)[1]
 
+            token_type_ids = torch.cat(token_type_ids, dim=1).to(device)
+            print("DEBUG::", input_ids.shape, token_type_ids.shape, labels.shape)
+            outputs = model(input_ids, token_type_ids=token_type_ids, labels=labels)
+
+            print("DEBUG:: made it past")
             preds = torch.ge(outputs, args.threshold).int().squeeze(1)
 
             preds_list.append(preds.to('cpu'))
@@ -238,10 +229,9 @@ if __name__ == '__main__':
 
     # Required
     parser.add_argument("--model_type", default=None, type=str, required=True,
-        help="Model type selected in the list: " + ", ".join(MODEL_CLASSES.keys()))
+        help="")
     parser.add_argument("--model_name_or_path", default=None, type=str, required=True,
-        help="Path to pre-trained model or shortcut name selected in the list: " \
-             + ", ".join(ALL_MODELS))
+        help="")
     parser.add_argument("--num_labels", default=None, type=int, required=True,
         help="Number of output classes")
     parser.add_argument("--save_dir", default=None, type=str, 
