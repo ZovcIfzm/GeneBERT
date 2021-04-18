@@ -85,11 +85,15 @@ print(fill_mask("hll hrr <mask>."))
 
 df = pd.DataFrame({"A": ["hhhh llhl <mask>", "hhlmmm mmmmm <mask>"]})
 
-#df2 = pd.read_csv('./word_tokenized/C1Test.csv', delimiter='\t', header=None)
+df2 = pd.read_csv('./word_tokenized/C1Test.csv', delimiter='\t', header=None)
 
-#print(df2.head())
+print(df2.head())
 
-tokenized = df["A"].apply((lambda x: tokenizer.encode(x, add_special_tokens=True)))
+df2['vals'] = df2[0].map(lambda x: x[694:])
+
+print(df2["vals"].head())
+
+tokenized = df2["vals"].apply((lambda x: tokenizer.encode(x, add_special_tokens=True)))
 #padd
 max_len = 0
 for i in tokenized.values:
@@ -108,7 +112,12 @@ with torch.no_grad():
     last_hidden_states = model(input_ids)
     features = last_hidden_states[0][:,0,:].numpy()
 
-print(features)
+#print(features)
+
+np.savetxt("C1TestEmbeddings.csv", 
+           features,
+           delimiter =", ", 
+           fmt ='% s')
 
 '''
 df = pd.read_csv('./sample_data/Train.tsv', delimiter='\t', header=None)
