@@ -130,3 +130,5 @@ dmypy.json
 
 data/ProcessedData/
 
+oscar.eo.txt
+pytorch_model.bin
