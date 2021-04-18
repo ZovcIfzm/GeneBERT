@@ -250,7 +250,7 @@ if __name__ == '__main__':
 
     # Dataset
     parser.add_argument("--data",  type=str,
-        default="./sample_data/sample_train.tsv",
+        default="./sample_data/Train.tsv",
         help="file name of data")
     parser.add_argument("--batch_size", default=32, type=int,
         help="batch size")

@@ -36,11 +36,11 @@ def convertLabels(c1_file, c2_file, output_file, lower, upper):
 
 	new_df = new_df.applymap(lambda x: 'l' if x < lower else ('m' if (x >= lower and x <= upper) else 'h'))
 
-	new_df.to_csv(output_file, index=False, header=True)
+	new_df.to_csv(output_file, sep='\t', index=False, header=False)
 
 
 
-
+# python3 convertLabels.py --lower -3 --upper 2 --c1_file data/Cell1.expr.csv --c2_file data/Cell2.expr.csv --output_file C12Diff.tsv
 
 if __name__ == '__main__':
 

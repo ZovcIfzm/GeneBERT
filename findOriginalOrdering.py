@@ -17,8 +17,7 @@ python3 convertHistoneLabels.py --cell_file data/Cell1.valid.csv --output_file C
 python3 convertHistoneLabels.py --cell_file data/Cell2.valid.csv --output_file C2Valid.csv
 '''
 
-
-def convertLabels(cell_file, output_file):
+def findOrder(cell_file, output_file):
 # From find_features()
     histones = None
 
@@ -62,7 +61,7 @@ parser.add_argument('--output_file', type=str, default="output_cell.csv", help="
 
 args = parser.parse_args()
 
-convertLabels(args.cell_file, args.output_file)
+findOrder(args.cell_file, args.output_file)
 
 
 

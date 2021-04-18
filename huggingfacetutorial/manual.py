@@ -2,7 +2,10 @@ from pathlib import Path
 
 from tokenizers import ByteLevelBPETokenizer
 
-paths = [str(x) for x in Path("./explore_bert").glob("**/*.txt")]
+DATA_DIR = "./word_tokenized"
+MODEL_DIR = "DeepInflam"
+
+paths = [str(x) for x in Path(DATA_DIR).glob("**/*.tsv")]
 
 # Initialize a tokenizer
 tokenizer = ByteLevelBPETokenizer()
@@ -16,15 +19,15 @@ tokenizer.train(files=paths, vocab_size=1000, min_frequency=2, special_tokens=[
     "<mask>",
 ])
 
-tokenizer.save_model("text")
+tokenizer.save_model(MODEL_DIR)
 
 from tokenizers.implementations import ByteLevelBPETokenizer
 from tokenizers.processors import BertProcessing
 
 
 tokenizer = ByteLevelBPETokenizer(
-    "./text/vocab.json",
-    "./text/merges.txt",
+    MODEL_DIR+"/vocab.json",
+    MODEL_DIR+"/merges.txt",
 )
 
 tokenizer._tokenizer.post_processor = BertProcessing(
@@ -37,7 +40,6 @@ print("three four encoded: ", tokenizer.encode("three four"))
 
 # 3. Train a language model from scratch
 import torch
-print("cude is available: ", torch.cuda.is_available())
 
 # define a config
 from transformers import RobertaConfig
@@ -52,7 +54,7 @@ config = RobertaConfig(
 
 from transformers import RobertaTokenizerFast
 
-tokenizer = RobertaTokenizerFast.from_pretrained("./text", max_len=512)
+tokenizer = RobertaTokenizerFast.from_pretrained(MODEL_DIR, max_len=512)
 
 from transformers import RobertaForMaskedLM
 
@@ -65,7 +67,7 @@ from transformers import LineByLineTextDataset
 
 dataset = LineByLineTextDataset(
     tokenizer=tokenizer,
-    file_path="./explore_bert/test.txt",
+    file_path=DATA_DIR+"/trainValidCorpus.tsv",
     block_size=128,
 )
 
@@ -80,7 +82,7 @@ data_collator = DataCollatorForLanguageModeling(
 from transformers import Trainer, TrainingArguments
 
 training_args = TrainingArguments(
-    output_dir="./text",
+    output_dir=MODEL_DIR,
     overwrite_output_dir=True,
     num_train_epochs=1,
     per_gpu_train_batch_size=64,
@@ -98,15 +100,15 @@ trainer = Trainer(
 
 trainer.train()
 
-trainer.save_model("./text")
+trainer.save_model(MODEL_DIR)
 
 # Check that the LM actually trained
 from transformers import pipeline
 
 fill_mask = pipeline(
     "fill-mask",
-    model="./text",
-    tokenizer="./text"
+    model=MODEL_DIR,
+    tokenizer=MODEL_DIR
 )
 
 print(fill_mask("three four <mask>."))
