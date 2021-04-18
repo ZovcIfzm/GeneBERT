@@ -6,7 +6,7 @@ import pandas as pd
 
 
 
-def convertLabels(c1_file, c2_file, lower, upper):
+def convertLabels(c1_file, c2_file, output_file, lower, upper):
 
 	cell1_df, cell2_df = None, None
 
@@ -34,27 +34,41 @@ def convertLabels(c1_file, c2_file, lower, upper):
 
 	new_df = cell1_df-cell2_df
 
-	new_df = new_df.applymap(lambda x: 'low' if x < lower else ('medium' if (x >= lower and x <= upper) else 'high'))
-	print(new_df.head())
+	new_df = new_df.applymap(lambda x: 'l' if x < lower else ('m' if (x >= lower and x <= upper) else 'h'))
 
-parser = argparse.ArgumentParser(description='CreateLabels')
-parser.add_argument('--lower', type=int, default=-5, help='lower limit for middle category')
-parser.add_argument('--upper', type=int, default=2, help='upper limit for middle category')
-parser.add_argument('--c1_file', type=str, default='data/Cell1.expr.csv', help='Path to file for cell 1')
-parser.add_argument('--c2_file', type=str, default='data/Cell1.expr.csv', help='Path to file for cell 2')
+	new_df.to_csv(output_file, index=False, header=True)
 
 
-args = parser.parse_args()
-
-lower = args.lower
-upper = args.upper
-
-# Labels < lower -> 'low'
-# Labels >= lower <= upper -> 'medium'
-# Labels > upper -> 'high'
 
 
-convertLabels(args.c1_file, args.c2_file, args.lower, args.upper)
+
+if __name__ == '__main__':
+
+	parser = argparse.ArgumentParser(description='CreateLabels')
+	parser.add_argument('--lower', type=int, default=-3, help='lower limit for middle category')
+	parser.add_argument('--upper', type=int, default=2, help='upper limit for middle category')
+	parser.add_argument('--c1_file', type=str, default='data/Cell1.expr.csv', help='Path to file for cell 1')
+	parser.add_argument('--c2_file', type=str, default='data/Cell2.expr.csv', help='Path to file for cell 2')
+	parser.add_argument('--output_file', type=str, default='tokenized_data/Cell1_Cell2_Conv.expr.csv', help='Path to output file')
+
+
+	args = parser.parse_args()
+
+	lower = args.lower
+	upper = args.upper
+
+	# Labels < lower -> 'low'
+	# Labels >= lower <= upper -> 'medium'
+	# Labels > upper -> 'high'
+
+
+	convertLabels(args.c1_file, args.c2_file, args.output_file, args.lower, args.upper)
+
+
+
+
+	# Test BERT with the categorical labels and compare metrics
+
 
 
 

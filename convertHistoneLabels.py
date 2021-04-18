@@ -35,7 +35,7 @@ def convertLabels(cell_file, output_file):
     df['concat'].to_csv(output_file, index=False, header=False)
 
 parser = argparse.ArgumentParser(description='CreateLabels')
-parser.add_argument('--cell_file', type=str, default='data/Cell1.expr.csv', help='Path to file for cell 1')
+parser.add_argument('--cell_file', type=str, default='data/Cell1.test.csv', help='Path to file for cell 1')
 parser.add_argument('--output_file', type=str, default="output_cell.csv", help="path for output file")
 
 args = parser.parse_args()
