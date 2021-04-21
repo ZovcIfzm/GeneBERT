@@ -3,7 +3,7 @@ from pathlib import Path
 from tokenizers import ByteLevelBPETokenizer
 
 DATA_DIR = "./word_tokenized"
-MODEL_DIR = "DeepInflam"
+MODEL_DIR = "GeneBERT"
 
 paths = [str(x) for x in Path(DATA_DIR).glob("**/*.tsv")]
 

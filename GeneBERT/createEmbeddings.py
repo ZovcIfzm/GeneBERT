@@ -23,7 +23,7 @@ python3 createEmbeddings.py --cell_file ./word_tokenized/DiffTest.csv --output_f
 
 
 def createEmbeddings(cell_file, output_file):
-    MODEL_DIR = "DeepInflam_1500"
+    MODEL_DIR = "GeneBERT_1500"
     model_class, tokenizer_class, pretrained_weights = (ppb.RobertaForMaskedLM, ppb.RobertaTokenizerFast, MODEL_DIR)
 
     tokenizer = tokenizer_class.from_pretrained(pretrained_weights)
