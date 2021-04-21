@@ -128,7 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-data/ProcessedData/
+ProcessedData/
 
 oscar.eo.txt
 pytorch_model.bin

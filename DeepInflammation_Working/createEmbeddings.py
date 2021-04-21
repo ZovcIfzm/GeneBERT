@@ -14,6 +14,10 @@ python3 createEmbeddings.py --cell_file ./word_tokenized/C1Train.csv --output_fi
 python3 createEmbeddings.py --cell_file ./word_tokenized/C2Train.csv --output_file C2TrainEmbeddings.csv
 python3 createEmbeddings.py --cell_file ./word_tokenized/C1Valid.csv --output_file C1ValidEmbeddings.csv
 python3 createEmbeddings.py --cell_file ./word_tokenized/C2Valid.csv --output_file C2ValidEmbeddings.csv
+
+python3 createEmbeddings.py --cell_file ./word_tokenized/DiffTrain.csv --output_file ./embeddings/DiffTrainEmbeddings.csv
+python3 createEmbeddings.py --cell_file ./word_tokenized/DiffValid.csv --output_file ./embeddings/DiffValidEmbeddings.csv
+python3 createEmbeddings.py --cell_file ./word_tokenized/DiffTest.csv --output_file ./embeddings/DiffTestEmbeddings.csv
 '''
 
 
