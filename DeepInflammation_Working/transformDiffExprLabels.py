@@ -46,9 +46,6 @@ def convertLabelsRegr(c1_file, c2_file, ref_file, output_file):
 
 
 	new_df = pd.DataFrame({"expr": cell1_df["expr"] - cell2_df["expr"]})
-
-	#print(new_df)
-
 	new_df.to_csv(output_file, sep='\t', index=False, header=False)
 
 
